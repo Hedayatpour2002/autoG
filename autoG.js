@@ -1,24 +1,23 @@
 import fs from "fs";
+
 import inquirer from "inquirer";
 const prompt = inquirer.createPromptModule();
 
-const question = [
-  {
-    type: "list",
-    message: "Do you need new warp account ?",
-    name: "needWarpAccount",
-    choices: [
-      {
-        name: "NO",
-        value: false,
-      },
-      {
-        name: "YES",
-        value: true,
-      },
-    ],
-  },
-];
+const question = {
+  type: "list",
+  message: "Do you need new warp account ?",
+  name: "needWarpAccount",
+  choices: [
+    {
+      name: "NO",
+      value: false,
+    },
+    {
+      name: "YES",
+      value: true,
+    },
+  ],
+};
 
 async function createWarpAccounts(count) {
   const accounts = [];
@@ -31,8 +30,34 @@ async function createWarpAccounts(count) {
 }
 
 async function readWarpAccounts() {
-  const accounts = await fs.readFileSync("./assets/warpAccounts.json");
+  const accounts = await fs.readFileSync("./assets/warpAccounts.json", "utf8");
   return JSON.parse(accounts);
+}
+
+function generateIPList() {
+  const maxCount = 100;
+  const temp = new Set();
+  const ranges = [
+    "162.159.192.",
+    "162.159.193.",
+    "162.159.195.",
+    "162.159.204.",
+    "188.114.96.",
+    "188.114.97.",
+    "188.114.98.",
+    "188.114.99.",
+  ];
+
+  while (temp.size < maxCount) {
+    ranges.forEach((range) => {
+      if (temp.size < maxCount) {
+        temp.add(`${range}${Math.floor(Math.random() * 256)}`);
+      }
+    });
+  }
+
+  const uniqueIPList = Array.from(temp);
+  return uniqueIPList;
 }
 
 async function autoG() {
@@ -42,11 +67,12 @@ async function autoG() {
   let accounts;
   try {
     accounts = await readWarpAccounts();
-    console.log(accounts);
   } catch {
     await createWarpAccounts(2);
     accounts = await readWarpAccounts();
-    console.log(accounts);
   }
+
+  const ipList = generateIPList();
+
 }
 autoG();
