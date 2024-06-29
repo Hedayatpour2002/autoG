@@ -1,4 +1,5 @@
 import fs from "fs";
+import ping from "ping";
 
 import inquirer from "inquirer";
 const prompt = inquirer.createPromptModule();
@@ -60,6 +61,22 @@ function generateIPList() {
   return uniqueIPList;
 }
 
+async function checkIpPerformance(ipList) {
+  const ipStats = [];
+  const ports = [903, 7103, 5279];
+
+  for (let ip of ipList) {
+    let res = await ping.promise.probe(ip);
+    ipStats.push({
+      ip: res.host,
+      ping: res.avg,
+      packetLoss: res.packetLoss,
+      port: ports[Math.floor(Math.random() * ports.length)],
+    });
+  }
+  return ipStats;
+}
+
 async function autoG() {
   const { needWarpAccount } = await prompt(question);
   needWarpAccount && (await createWarpAccounts(2));
@@ -73,6 +90,6 @@ async function autoG() {
   }
 
   const ipList = generateIPList();
-
+  const ipStats = await checkIpPerformance(ipList);
 }
 autoG();
