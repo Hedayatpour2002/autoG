@@ -1,8 +1,9 @@
 import fs from "fs/promises";
 import fetch from "node-fetch";
 import ping from "ping";
-
+import clipboardy from "clipboardy";
 import inquirer from "inquirer";
+
 const prompt = inquirer.createPromptModule();
 
 const question = {
@@ -182,6 +183,8 @@ async function autoG() {
       config.outbounds[1].reserved = accounts[1].reserved;
 
       await createConfigFile(config);
+      await clipboardy.write(JSON.stringify(config));
+      console.log("Config copied to clipboard.");
     } else {
       console.error(
         "No clean IP found. Please disable any proxy or VPN and try again."
